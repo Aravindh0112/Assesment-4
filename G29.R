@@ -2,6 +2,8 @@
 # Md.Nayem Dewan : s2613404
 # Aman Syed : s2496727
 
+#Github link: https://github.com/Aravindh0112/G29_Assesment-4.git
+
 # Contributions : This assignment is completed with combined effort of all
 # team members. Aravindh developed the netup and forward function , where
 # from thereon Nayem coded on the backward and train functions , incorporating
