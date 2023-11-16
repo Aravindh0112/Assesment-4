@@ -213,4 +213,4 @@ predicted_labels <- predict_nn(nn, test_features)
 misclassification_rate <- mean(predicted_labels != test_labels)
 
 # Print misclassification rate for Test set
-print(paste0("Misclassification Rate for test set: ", round(misclassification_rate * 100, 2), "%"))
+print(paste0("Misclassification rate for the test set: ", round(misclassification_rate * 100, 2), "%"))
