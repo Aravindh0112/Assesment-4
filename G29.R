@@ -2,15 +2,15 @@
 # Md.Nayem Dewan : s2613404
 # Aman Syed : s2496727
 
-#Github link: https://github.com/Aravindh0112/G29_Assesment-4.git
+# Github link: https://github.com/Aravindh0112/G29_Assesment-4.git
 
 # Contributions : This assignment is completed with combined effort of all
 # team members. Aravindh developed the netup and forward function , where
-# from thereon Nayem coded on the backward and train functions , incorporating
-# above code , following which Aman worked on finding the optimal seed and
-# predict function , through which we fetched the misclassification rate.
+# from thereon Nayem coded on the backward and train functions and atlast,
+# on incorporating the above functions , Aman worked on finding the optimal 
+# seed to minimize loss and fetched the misclassification rate on the test set.
 
-# Functions to set up a simple neural network for classification,
+# Set of functions to set up a simple neural network for classification,
 # and to train it using stochastic gradient descent , thereby
 # predicting on the test data and finding the misclassification rate.
 
@@ -148,11 +148,11 @@ train <- function(nn, inp, k, eta = 0.01, mb = 10, nstep = 10000) {
     # Take average of dW
     nn$dW <- lapply(seq_along(dW_ls[[1]]), function(i){
       Reduce(`+`, lapply(dW_ls, function(lst) lst[[i]])) / length(dW_ls)
-      })
+    })
     # Take average of db
     nn$db <- lapply(seq_along(db_ls[[1]]), function(i){
       Reduce(`+`, lapply(db_ls, function(lst) lst[[i]])) / length(db_ls)
-      })
+    })
     
     # Update parameters (W and b) using stochastic gradient descent
     # Formula : W^l  ← W^l − eta * dW^l
@@ -164,9 +164,31 @@ train <- function(nn, inp, k, eta = 0.01, mb = 10, nstep = 10000) {
       nn$W[[l]] <- nn$W[[l]] - eta * nn$dW[[l]]
       nn$b[[l]] <- nn$b[[l]] - eta * nn$db[[l]]
     }
-    if(step %% 1000 == 0) {
-      p_k_value <- exp(nn$h[[length(nn$h)]])/sum(exp(nn$h[[length(nn$h)]]))
-      loss_value <-  sum(-log(p_k_value)) / nrow(inp)
+    # After 1st iteration and thereafter on every 1000th iteration calculate and print loss value
+    if(step == 1 | step %% 1000 == 0) {
+      # Initialize pki to store the probability that the output variable is in class ki
+      pki <- numeric(nrow(inp))
+      # iterate over each training input value
+      for(i in 1:nrow(inp)){
+        # Perform a forward pass to obtain the network's output
+        temp_nn <- forward(nn, inp[i,])
+        n_layer <- length(nn$h)
+        # Extract the output values from the last layer
+        h_last_layer <- temp_nn$h[[n_layer]]
+        # Calculate pki
+        # Formula : pki    = exp(h_ki^L) / sum(h^L)
+        # Where   : pki    = the probability that the output variable is in class k for 'i'th input
+        #         : h_ki^L = 'k'th nodes value of Last layer for 'i'th input
+        #         : h^L    = vector of all node values of Last layer for 'i'th input 
+        pki <- exp(h_last_layer[k[[i]]]) / sum(exp(h_last_layer))
+      }
+      # Calculate loss
+      # Formula : Loss = - sum(log(pki)) / n
+      # Where   : Loss = Loss
+      #         : pki  = the probability that the output variable is in class k for 'i'th input
+      #         : n    = number of input values
+      loss_value <-  - sum(log(pki)) / nrow(inp)
+      # Print loss
       cat('\n The loss value after ',step,' iterations are ', loss_value)
     }
   }
@@ -236,5 +258,5 @@ predicted_labels <- predict_nn(nn, test_features)
 misclassification_rate <- mean(predicted_labels != test_labels)
 
 # Print misclassification rate for Test set
-cat("\n Misclassification rate for the test set: ", round(misclassification_rate * 100, 2), "%")
+cat("\n Misclassification rate for the test set : ", round(misclassification_rate * 100, 2), "%")
 
