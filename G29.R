@@ -1,3 +1,17 @@
+# Aravindh Sankar Ravisankar : s2596860
+# Md.Nayem Dewan : s2613404
+# Aman Syed : s2496727
+
+# Contributions : This assignment is completed with combined effort of all
+# team members. Aravindh developed the netup and forward function , where
+# from thereon Nayem coded on the backward and train functions , incorporating
+# above code , following which Aman worked on finding the optimal seed and
+# predict function , through which we fetched the misclassification rate.
+
+# Functions to set up a simple neural network for classification,
+# and to train it using stochastic gradient descent , thereby
+# predicting on the test data and finding the misclassification rate.
+
 # Function to initialize a neural network with random weights and offsets
 netup <- function(d) {
   # Input : d   - vector representing the number of nodes in each layer
@@ -45,7 +59,7 @@ forward <- function(nn, inp) {
 
 # Function to perform a backward pass (back-propagation) through the neural network
 backward <- function(nn, k) {
-  # Input : nn  - the neural network
+  # Input : nn  - the neural network with updated node values.
   #         k   - index of the output class
   # Output: nn  - the neural network with computed derivatives
   
@@ -102,7 +116,7 @@ backward <- function(nn, k) {
 
 # Function to train the neural network using stochastic gradient descent
 train <- function(nn, inp, k, eta = 0.01, mb = 10, nstep = 10000) {
-  # Input : nn    - the neural network, 
+  # Input : nn    - the updated neural network with computed derivatives, 
   #         inp   - input data, 
   #         k     - target classes,
   #         eta   - step size,
@@ -148,6 +162,11 @@ train <- function(nn, inp, k, eta = 0.01, mb = 10, nstep = 10000) {
       nn$W[[l]] <- nn$W[[l]] - eta * nn$dW[[l]]
       nn$b[[l]] <- nn$b[[l]] - eta * nn$db[[l]]
     }
+    if(step %% 1000 == 0) {
+      p_k_value <- exp(nn$h[[length(nn$h)]])/sum(exp(nn$h[[length(nn$h)]]))
+      loss_value <-  sum(-log(p_k_value)) / nrow(inp)
+      cat('\n The loss value after ',step,' iterations are ', loss_value)
+    }
   }
   
   return(nn)
@@ -165,12 +184,14 @@ labels <- as.numeric(iris$Species)
 
 # Create training and test sets
 # Where the test data consists of every 5th row of
-# the iris dataset, starting from row 5
+# the iris dataset, starting from row 5.
 test_indices <- seq(5, nrow(iris), by = 5)
 
+# train dataset has 120 rows
 train_features <- features[-test_indices, ]
 train_labels <- labels[-test_indices]
 
+#test dataset has 30 rows
 test_features <- features[test_indices, ]
 test_labels <- labels[test_indices]
 
@@ -178,7 +199,7 @@ test_labels <- labels[test_indices]
 nn_int <- netup(c(4, 8, 7, 3))
 
 # Train the neural network
-nn <- train(nn_int, train_features, train_labels, eta = 0.01, mb = 10, nstep = 1000)
+nn <- train(nn_int, train_features, train_labels, eta = 0.01, mb = 10, nstep = 10000)
 
 # Function to predict using the neural network
 predict_nn <- function(nn, features){
@@ -213,4 +234,5 @@ predicted_labels <- predict_nn(nn, test_features)
 misclassification_rate <- mean(predicted_labels != test_labels)
 
 # Print misclassification rate for Test set
-print(paste0("Misclassification rate for the test set: ", round(misclassification_rate * 100, 2), "%"))
+cat("\n Misclassification rate for the test set: ", round(misclassification_rate * 100, 2), "%")
+
